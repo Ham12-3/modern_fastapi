@@ -1,12 +1,22 @@
+# Core framework
 fastapi>=0.110.0
 uvicorn>=0.25.0
-sqlalchemy>=2.0.0
 pydantic>=2.5.0
-jinja2==3.1.2
+
+# Database
+sqlalchemy>=2.0.0
+psycopg2-binary>=2.9.9  # Requires Visual C++ Build Tools
+# asyncpg>=0.29.0       # Uncomment if needed
+
+# Templates
+jinja2>=3.1.2
+
+# Environment variables
+python-dotenv>=1.0.0
+
+# API integration
 openai>=1.0.0
+requests>=2.28.1
 
-python-dotenv==0.20.0
-requests==2.28.1
-gunicorn==20.1.0
-
-alembic==1.13.1
+# Production (optional)
+gunicorn>=20.1.0

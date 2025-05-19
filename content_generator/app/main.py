@@ -16,3 +16,24 @@ models.base.metadata.create_all(bind=engine)
 app = FastAPI()
 
 templates = Jinja2Templates(directory="templates")
+
+def get_db():
+    db= SessionLocal()
+    try: 
+        yield db
+    finally:
+        db.close()
+
+@app.get("/")
+def read_root(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
+
+
+
+
+@app.posr("/generate")
+async def generate_content(payload: schemas.GeneratePayload, db: Session = Depends(get_db)):
+    generated_text = await run_in_threadpool(utility.generate_content, db,payload.topic)
+
+
+    return {"generated_text":generated_text }

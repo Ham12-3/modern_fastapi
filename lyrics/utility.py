@@ -75,4 +75,14 @@ def transcibe_wav_to_text(wav_path):
 ########################################
 
 
-
+async def summarize_text(text):
+    try:
+        
+        
+    except Exception as e:
+        logging.error(f"An error occurred during text summarization: {e}")
+        
+        return "Summary generation failed"
+        
+         
+        

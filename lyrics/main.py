@@ -10,6 +10,9 @@ from fastapi.templating import Jinja2Templates
 
 from fastapi.middleware.cors import CORSMiddleware
 
+
+from fastapi.background import BackgroundTasks
+
 import os
 
 from io import BytesIO
@@ -156,9 +159,18 @@ async def generate_imaeg(payload: LyricsPayload):
 
 @app.get("/media/generated_image.png")
 async def get_generated_image():
-    return FileResponse("media/generated_image.png")
+    image_path = "media/generated_image.png"
+    if not os.path.exists(image_path):
+        raise HTTPException(status_code=404, detail="Image not found")
+    return FileResponse(image_path)
         
         
-    # convert mp3 to wav 
-   
+@app.get("/cleanup")
+async def cleanup_files(background_tasks: BackgroundTasks):
+    # Clean up files in the background
+    background_tasks.add_task(utility.cleanup_old_files, "uploads", 24)
+    background_tasks.add_task(utility.cleanup_old_files, "converted_files", 24)
+    background_tasks.add_task(utility.cleanup_old_files, "media", 48)
+    return {"message": "Cleanup scheduled"}
+
 

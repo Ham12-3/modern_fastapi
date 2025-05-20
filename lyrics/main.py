@@ -83,12 +83,82 @@ async def create_upload_file(file:UploadFile=File(...), language: str= Form(...)
     summary = await summarize_text(lyrics)
     
     return {"lyrics": lyrics, "summary": summary}
+
+
+@app.post('/generate_image/')
+async def generate_imaeg(payload: LyricsPayload):
     
+    try: 
+        api_key  = os.getenv("OPENAI_API_KEY")
+        
+        if not api_key:
+            logging.error("API key not found")
+            raise HTTPException(status_code=500, detail="API key not found")
+        
+        
+        dalle_url = "https://api.openai.com/v1/images/generations"
+        
+        headers = {
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json"
+        }
+        
+        
+        prompt = f"Generate an image based on this summary of a song:  {payload.lyrics}"
+        
+        if len(prompt)  > 1000:
+            prompt = prompt[:1000]
+            
+        data = {"prompt": prompt,
+                "size": "1024x1024",
+                "n": 1}
+        
+        logging.info(f"Sending to OPenAI API with {data}")
+        
+        
+        response = requests.post(dalle_url, headers=headers, json=data)
+        
+        logging.info(f"OpenAI api response : {response.status_code}")
+        
+        
+        logging.info(f"OpenAI API response content: {response.text}")
+        
+        
+        response.raise_for_status()
+        image_url = response.json()['data'][0]['url']
+        
+        
+        image_response = requests.get(image_url)
+        
+        image_response.raise_for_status()
+        
+        
+        image= Image.open(BytesIO(image_response.content))
+        
+        
+        if not os.path.exists("media"):
+            os.makedirs("media")
+        image_path = os.path.join("media", "generated_image.png")
+        image.save(image_path)
+        
+        
+        
+        logging.info(f"Image saved at {image_path}")
+        
+        return {"image_path": image_path}
+    except requests.exceptions.RequestException as e:
+        logging.error(f"Request exception: {e}")
+        
+        raise HTTPException(status_code=500, detail=str(e))
     
     
 
 
-
+@app.get("/media/generated_image.png")
+async def get_generated_image():
+    return FileResponse("media/generated_image.png")
+        
+        
     # convert mp3 to wav 
    
 

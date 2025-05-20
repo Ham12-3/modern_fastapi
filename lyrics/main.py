@@ -23,8 +23,10 @@ import openai
 
 import requests
 
-from schemas import LyricsPayload
 
+import utility
+from schemas import LyricsPayload
+from utility import summarize_text, transcibe_wav_to_text, split_audio, convert_mp3_to_wav
 
 load_dotenv()
 
@@ -73,6 +75,18 @@ async def create_upload_file(file:UploadFile=File(...), language: str= Form(...)
     # AUDIO PROCESSING 
 
     wave_file_location = f"converted_files/{file.filename.replace('.mp3', '.wav')}"
+    convert_mp3_to_wav(file_location, wave_file_location)
+    lyrics = transcibe_wav_to_text(wave_file_location)
+    
+    os.remove(file_location)
+    
+    summary = await summarize_text(lyrics)
+    
+    return {"lyrics": lyrics, "summary": summary}
+    
+    
+    
+
 
 
     # convert mp3 to wav 

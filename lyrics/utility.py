@@ -77,6 +77,16 @@ def transcibe_wav_to_text(wav_path):
 
 async def summarize_text(text):
     try:
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages= [
+                {"role": "system", "content": "you are a helpful assistant"},
+                {"role": "user", "content": f"Summarize the following text in one sentence: {text}"}
+            ]
+        )
+        summary = response.choices[0].message['content'].strip()
+        logging.info(f"Summary: {summary}")
+        return summary
         
         
     except Exception as e:

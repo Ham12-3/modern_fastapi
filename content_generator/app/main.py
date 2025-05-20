@@ -11,7 +11,7 @@ from database import engine, SessionLocal
 from starlette.concurrency import run_in_threadpool
 
 
-models.base.metadata.create_all(bind=engine)
+models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
@@ -26,7 +26,7 @@ def get_db():
 
 @app.get("/")
 def read_root(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+    return templates.TemplateResponse("index2.html", {"request": request})
 
 
 
@@ -43,7 +43,5 @@ async def generate_content(payload: schemas.GeneratePayload, db: Session = Depen
 
 @app.post("/analyze")
 async def analyze_content(payload: schemas.AnalyzePayload, db: Session = Depends(get_db)):
-    readability, sentiment = await run_in_threadpool(utility.analyze_content, db,payload.topic)
-
-
-    return {"generated_text":generated_text }
+    readability, sentiment = await run_in_threadpool(utility.analyze_content, db, payload.content)
+    return {"readability": readability, "sentiment": sentiment}

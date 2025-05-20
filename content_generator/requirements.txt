@@ -1,7 +1,8 @@
 fastapi
 sqlalchemy
-psycopg2-binary
+psycopg2
 openai
 requests
 uvicorn
 python-dotenv
+jinja2

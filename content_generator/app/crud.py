@@ -12,7 +12,7 @@ def create_search_term(db:Session, term: str):
 
 
 def create_generated_content(db:Session, content: str, search_term_id:int): 
-    db_generate_content= models.GeneratedContent(content=content, search_term_id=search_term_id)
+    db_generate_content= models.GenerateContent(content=content, search_term_id=search_term_id)
     db.add(db_generate_content)
     db.commit()
     db.refresh(db_generate_content)

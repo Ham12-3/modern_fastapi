@@ -37,6 +37,38 @@ def generate_content(db:Session, topic: str) -> str:
         generated_text = response.choices[0].message['content'].strip()
         crud.create_generated_content(db, search_term.id, generated_text)
         return generated_text
+    
+
+
+def analyze_content(db:Session, content:str):
+    with semaphore:
+        search_term = crud.get_search_term(db, content)
+    if not search_term:
+        search_term = crud.create_search_term(db, content)
+    
+    readability = get_readability_score(content)
+
+    sentiment = get_sentiment_analysis(content)
+
+    crud.create_sentiment_analysis(db, readability, sentiment, search_term.id)
+
+def get_readability_score(content: str) -> str:
+    return "Readbility Score: Good"
+
+
+def get_sentiment_analysis(content: str) -> str:
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system", "content": "You are a helpful assistant"},
+             {"role": "user", "content": f"Analyze the sentiment of the following text:\n\n{content}\n\nIs the sentiment positive, negative, or neutral?"},
+        ],
+        max_tokens=10,
+    )
+
+    return response.choices[0].message['content'].strip()
+    
+
 
 
 

@@ -31,9 +31,19 @@ def read_root(request: Request):
 
 
 
-@app.posr("/generate")
+@app.post("/generate")
 async def generate_content(payload: schemas.GeneratePayload, db: Session = Depends(get_db)):
     generated_text = await run_in_threadpool(utility.generate_content, db,payload.topic)
+
+
+    return {"generated_text":generated_text }
+
+
+
+
+@app.post("/analyze")
+async def analyze_content(payload: schemas.AnalyzePayload, db: Session = Depends(get_db)):
+    readability, sentiment = await run_in_threadpool(utility.analyze_content, db,payload.topic)
 
 
     return {"generated_text":generated_text }

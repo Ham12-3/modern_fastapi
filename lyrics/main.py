@@ -107,7 +107,7 @@ async def generate_imaeg(payload: LyricsPayload):
         }
         
         
-        prompt = f"Generate an image based on this summary of a song:  {payload.lyrics}"
+        prompt = f"I have a song and I will summarize a song, I want you to create a art based on the summary of the song {payload.lyrics}"
         
         if len(prompt)  > 1000:
             prompt = prompt[:1000]
